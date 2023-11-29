@@ -1,0 +1,60 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+.bloc{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 100vw;
+}
+
+.titre{
+    margin-bottom: 1vw;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.debutant{
+        display: grid;
+        grid-template-columns: repeat(9, 1fr);
+}
+
+.intermediaire{
+    display: grid;
+    grid-template-columns: repeat(16, 1fr);
+}
+
+.expert{
+    display: grid;
+    grid-template-columns: repeat(22, 1fr);
+}
+
+.maître{
+    display: grid;
+    grid-template-columns: repeat(30, 1fr);
+}
+
+.g{
+    width: 20px;
+    height: 20px;
+}
+
+#timer{
+    margin-left: 1vw;
+}
+
+#difficulte{
+    margin-right: 1vw;
+}
+
+.game{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}

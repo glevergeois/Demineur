@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>demineur</title>
+    <link rel="stylesheet" href="main.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+<body>
+    <div class="bloc">
+        <h1 style="margin: 1vw;">Demineur</h1>
+
+        <div class="titre">
+            <label for="difficulte">Choisir une difficulté:</label>
+
+                <select name="choice" id="difficulte">
+                    <option value="">--Faites un choix--</option>
+                    <option value="debutant">Débutant</option>
+                    <option value="intermediaire">Intermédiaire</option>
+                    <option value="expert">Expert</option>
+                    <option value="maître">Maître</option>
+                </select>
+
+            <button type="button" id="startButton">Nouvelle Partie</button>
+            <div id="timer"></div>
+        </div>
+        
+        <div class="game">
+            <h1>Mines: <span id="mines-count">0</span></h1>
+            <div id="board">
+                
+            </div>
+            <div id="victoire"> 
+            </div>
+            <div id="perdu"> 
+            </div>
+        </div>
+        <button id="flag-button">🚩</button>
+        
+    </div>
+    
+    <script src="demineur.js"></script>
+</body>
+</html>
