@@ -67,6 +67,7 @@ function startGame(rows, cols, minesCount) {
             });
             tile.classList.remove("tile-clicked");
             boardContainer.appendChild(tile);
+            document.getElementById("mines-count").innerText = minesCount;
             row.push(tile);
         }
         board.push(row);
