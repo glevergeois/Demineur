@@ -149,6 +149,7 @@ function clickTile(r, c, rows, cols) {
 }
 
 function checkMine(r, c, rows, cols) {
+
     if (r < 0 || r >= rows || c < 0 || c >= cols) {
         return;
     }
@@ -178,35 +179,31 @@ function checkMine(r, c, rows, cols) {
     minesFound += checkTile(r + 1, c, rows, cols);       // bottom 
     minesFound += checkTile(r + 1, c + 1, rows, cols);   // bottom right
 
-    if (minesFound === 0) {
-        // Appel correct de checkMine pour les cases adjacentes
-        checkMine(r - 1, c - 1, rows, cols);   // top left
-        checkMine(r - 1, c, rows, cols);       // top
-        checkMine(r - 1, c + 1, rows, cols);   // top right
+    if (minesFound > 0) {
+        board[r][c].innerText = minesFound;
+        board[r][c].classList.add("x" + minesFound.toString());
+    } else {
+        board[r][c].innerText = "";
+        
+        //top 3
+        checkMine(r-1, c-1);    //top left
+        checkMine(r-1, c);      //top
+        checkMine(r-1, c+1);    //top right
 
-        checkMine(r, c - 1, rows, cols);       // left
-        checkMine(r, c + 1, rows, cols);       // right
+        //left and right
+        checkMine(r, c-1);      //left
+        checkMine(r, c+1);      //right
 
-        checkMine(r + 1, c - 1, rows, cols);   // bottom left
-        checkMine(r + 1, c, rows, cols);       // bottom
-        checkMine(r + 1, c + 1, rows, cols);   // bottom right
+        //bottom 3
+        checkMine(r+1, c-1);    //bottom left
+        checkMine(r+1, c);      //bottom
+        checkMine(r+1, c+1);    //bottom right
     }
 
     if (tilesClicked === rows * cols - minesCount) {
         document.getElementById("mines-count").innerText = "Cleared";
         gameOver = true;
     }
-}
-
-
-function checkTile(r, c, rows, cols) {
-    if (r < 0 || r >= rows || c < 0 || c >= cols) {
-        return 0;
-    }
-    if (minesLocation.includes(r.toString() + "-" + c.toString())) {
-        return 1;
-    }
-    return 0;
 }
 
 function checkTile(r, c, rows, cols) {
