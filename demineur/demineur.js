@@ -7,6 +7,7 @@ document.getElementById("difficulte").addEventListener('change', function () {
     if (this.value === "") {
         clearBoard();
     } else {
+        gameOver = false;
         initGame();
         startGame();
     }
@@ -80,12 +81,11 @@ function startGame() {
 
 
 function setMines() {
+
     let minesLeft = minesCount;
 
-    if (!minesLocation) {
-        minesLocation = [];
-    }
-
+    minesLocation = [];
+    
     while (minesLeft > 0) {
         let r = Math.floor(Math.random() * rows);
         let c = Math.floor(Math.random() * cols);
