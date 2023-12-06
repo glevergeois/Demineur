@@ -1,12 +1,14 @@
 // Variables globales
 let minesCount, minesLocation, tilesClicked, flagEnabled, gameOver, board;
+let rows, cols;
+
 
 document.getElementById("difficulte").addEventListener('change', function () {
     if (this.value === "") {
         clearBoard();
     } else {
-        const { rows, cols, minesCount } = initGame();
-        startGame(rows, cols, minesCount);
+        initGame();
+        startGame();
     }
 });
 
@@ -15,8 +17,6 @@ function initGame() {
 
     let difficulty = document.getElementById("difficulte").value;
     document.getElementById("flag-button").addEventListener("click", setFlag);
-
-    let rows, cols;
 
     switch (difficulty) {
         case 'debutant':
@@ -46,11 +46,9 @@ function initGame() {
 
     const boardContainer = document.getElementById("board");
     boardContainer.className = difficulty;
-
-    return { rows, cols, minesCount };
 }
 
-function startGame(rows, cols, minesCount) {
+function startGame() {
     const boardContainer = document.getElementById("board");
     clearBoard();
 
@@ -63,7 +61,7 @@ function startGame(rows, cols, minesCount) {
             tile.id = r.toString() + "-" + c.toString();
             tile.src = "./images/normal.png";
             tile.addEventListener("click", function() {
-                clickTile(r, c, rows, cols);
+                clickTile(r, c);
             });
             tile.classList.remove("tile-clicked");
             boardContainer.appendChild(tile);
@@ -75,13 +73,13 @@ function startGame(rows, cols, minesCount) {
 
     console.log(board);
 
-    setMines(rows, cols, minesCount);
+    setMines();
 
     document.getElementById("flag-button").addEventListener("click", setFlag);
 }
 
 
-function setMines(rows, cols, minesCount) {
+function setMines() {
     let minesLeft = minesCount;
 
     if (!minesLocation) {
@@ -98,6 +96,7 @@ function setMines(rows, cols, minesCount) {
             minesLeft -= 1;
         }
     }
+    console.log(minesLocation)
 }
 
 function clearBoard() {
@@ -114,7 +113,7 @@ function setFlag() {
     document.getElementById("flag-button").style.backgroundColor = flagEnabled ? "darkgray" : "lightgray";
 }
 
-function clickTile(r, c, rows, cols) {
+function clickTile(r, c) {
     let tile = board[r][c];
 
     console.log('Clicked Tile:', r, c);
@@ -128,7 +127,6 @@ function clickTile(r, c, rows, cols) {
     }
 
     if (!tile.classList.contains("tile-clicked")) {
-        tile.classList.add("tile-clicked"); // Ajoutez cette ligne ici pour le clic initial
         if (flagEnabled) {
             console.log('f');
             toggleFlag(tile);
@@ -138,46 +136,45 @@ function clickTile(r, c, rows, cols) {
         if (minesLocation.includes(tile.id)) {
             console.log('g');
             gameOver = true;
-            revealMines(rows, cols);
+            revealMines();
         } else {
             console.log('h');
-            checkMine(r, c, rows, cols);
+            checkMine(r, c);
         }
-
-        updateTileImage(tile, r, c, rows, cols);
     }
 }
 
-function checkMine(r, c, rows, cols) {
-
+function checkMine(r, c) {
+    console.log('Clicked Tile:', r, c);
     if (r < 0 || r >= rows || c < 0 || c >= cols) {
         return;
     }
 
     let tile = board[r][c];
-
+    console.log('b');
     if (tile.classList.contains("tile-clicked")) {
         return;
     }
 
+    console.log('c');
     tile.classList.add("tile-clicked");
     tilesClicked += 1;
 
     let minesFound = 0;
 
     // top 3
-    minesFound += checkTile(r - 1, c - 1, rows, cols);   // top left
-    minesFound += checkTile(r - 1, c, rows, cols);       // top 
-    minesFound += checkTile(r - 1, c + 1, rows, cols);   // top right
+    minesFound += checkTile(r - 1, c - 1);   // top left
+    minesFound += checkTile(r - 1, c);       // top 
+    minesFound += checkTile(r - 1, c + 1);   // top right
 
     // left and right
-    minesFound += checkTile(r, c - 1, rows, cols);       // left
-    minesFound += checkTile(r, c + 1, rows, cols);       // right
+    minesFound += checkTile(r, c - 1);       // left
+    minesFound += checkTile(r, c + 1);       // right
 
     // bottom 3
-    minesFound += checkTile(r + 1, c - 1, rows, cols);   // bottom left
-    minesFound += checkTile(r + 1, c, rows, cols);       // bottom 
-    minesFound += checkTile(r + 1, c + 1, rows, cols);   // bottom right
+    minesFound += checkTile(r + 1, c - 1);   // bottom left
+    minesFound += checkTile(r + 1, c);       // bottom 
+    minesFound += checkTile(r + 1, c + 1);   // bottom right
 
     if (minesFound > 0) {
         board[r][c].innerText = minesFound;
@@ -204,9 +201,11 @@ function checkMine(r, c, rows, cols) {
         document.getElementById("mines-count").innerText = "Cleared";
         gameOver = true;
     }
+    console.log('d');
+    updateTileImage(tile, r, c);
 }
 
-function checkTile(r, c, rows, cols) {
+function checkTile(r, c) {
     if (r < 0 || r >= rows || c < 0 || c >= cols) {
         console.log('n');
         return 0;
@@ -218,11 +217,11 @@ function checkTile(r, c, rows, cols) {
     return 0;
 }
 
-function countAdjacentMines(row, col, rows, cols) {
+function countAdjacentMines(r, c) {
     let minesFound = 0;
 
-    for (let i = row - 1; i <= row + 1; i++) {
-        for (let j = col - 1; j <= col + 1; j++) {
+    for (let i = r - 1; i <= r + 1; i++) {
+        for (let j = c - 1; j <= c + 1; j++) {
             if (i >= 0 && i < rows && j >= 0 && j < cols && minesLocation.includes(i.toString() + "-" + j.toString())) {
                 minesFound++;
             }
@@ -232,7 +231,7 @@ function countAdjacentMines(row, col, rows, cols) {
     return minesFound;
 }
 
-function updateTileImage(tile, r, c, rows, cols) {
+function updateTileImage(tile, r, c) {
     const flagImagePath = "./images/flag.png";
 
     if (tile.getAttribute("src") !== flagImagePath) {
@@ -241,7 +240,7 @@ function updateTileImage(tile, r, c, rows, cols) {
             tile.src = "./images/bomb.png";  // Changer l'image en cas de mine
         } else {
             console.log('b');
-            let minesFound = countAdjacentMines(r, c, rows, cols);
+            let minesFound = countAdjacentMines(r, c);
             if (minesFound > 0) {
                 console.log('c');
                 tile.src = `./images/${minesFound}.png`;  // Changer l'image en cas de mine adjacente
@@ -262,12 +261,19 @@ function toggleFlag(tile) {
     }
 }
 
-function revealMines(rows, cols) {
+function revealMines() {
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
             let tile = board[r][c];
             if (minesLocation.includes(tile.id)) {
-                tile.src = "./images/bomb.png";                
+                tile.src = "./images/bomb.png";               
+            } else {
+                let minesFound = countAdjacentMines(r, c);
+                if (minesFound > 0) {
+                    tile.src = `./images/${minesFound}.png`;  // Changer l'image en cas de mine adjacente
+                } else {
+                    tile.src = "./images/empty.png";  // Changer l'image s'il n'y a pas de mine
+                }
             }
         }
     }
