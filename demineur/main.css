@@ -58,3 +58,20 @@
     justify-content: center;
     flex-direction: column;
 }
+
+#victoire{
+    margin: 1vw;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#perdu{
+    margin: 1vw;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
