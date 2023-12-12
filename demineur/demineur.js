@@ -142,9 +142,9 @@ function clickTile(r, c) {
 
 function WinOrLose(){
     if (gameOver == true){
-        document.getElementById("perdu").innerHTML = "Vous avez perdu ...";
-        revealMines();
         Chrono();
+        revealMines();
+        document.getElementById("perdu").innerHTML = "Vous avez perdu ...";
     } else if ((rows * cols) - minesCount == tilesCount){
         endTime = Date.now();
         document.getElementById("victoire").innerHTML = "Vous avez gagné en " + displayTime(endTime - startTime);
