@@ -1,6 +1,7 @@
-// Variables globales
-let minesCount, minesLocation, tilesClicked, tilesCount, flagEnabled, gameOver, board;
+let minesCount, minesLocation, tilesClicked, tilesCount, flagEnabled, gameOver, board, startTime, endTime;
 let rows, cols;
+var timer = null;
+var timeEl = document.getElementById('timer');
 
 document.getElementById("startButton").addEventListener("click", function() {
     if (gameOver == true) {
@@ -22,16 +23,11 @@ document.getElementById("difficulte").addEventListener('change', function () {
         startGame();
     }
 });
-document.getElementById("Gagner").addEventListener('click', function () {
-    if (gameOver == false) {
-        gameOver = true
-        revealMines()
-        console.log('gagné')
-    }
-});
 
 function initGame() {
     clearBoard();
+    document.getElementById("perdu").innerHTML = "";
+    document.getElementById("victoire").innerHTML = "";
 
     let difficulty = document.getElementById("difficulte").value;
 
@@ -69,9 +65,10 @@ function startGame() {
     const boardContainer = document.getElementById("board");
     clearBoard();
     tilesCount = 0;
-    console.log(tilesCount)
+    timer = null;
+    Chrono();
 
-    board = []; // Initialisation de la variable globale board
+    board = [];
 
     for (let r = 0; r < rows; r++) {
         let row = [];
@@ -89,9 +86,6 @@ function startGame() {
         }
         board.push(row);
     }
-
-    console.log(board);
-
     setMines();
 }
 
@@ -111,47 +105,36 @@ function setMines() {
             minesLeft -= 1;
         }
     }
-    console.log(minesLocation)
 }
 
 function clearBoard() {
     if (board) {
-        board = []; // Réinitialisation de la variable globale board
+        board = [];
     }
 
     const boardContainer = document.getElementById("board");
     boardContainer.innerHTML = "";
 }
 
-function clickTile(r, c, event) {
+function clickTile(r, c) {
     let tile = board[r][c];
     if (event.which == 3){
-        handleRightClick(r, c, event);
+        toggleFlag(r, c);
+        return;
     }
-
-    console.log('Clicked Tile:', r, c);
 
     if (gameOver == true) {
-        console.log('y')
         if (!tile.classList.contains("tile-clicked")) {
-            console.log('e');
             return;
         }
     }
 
-    if (!tile.classList.contains("tile-clicked")) {
-        if (flagEnabled) {
-            console.log('f');
-            toggleFlag(tile);
-            return;
-        }
+    if (!tile.classList.contains("tile-clicked") || !tile.classlist.contains("flagged")) {
 
         if (minesLocation.includes(tile.id)) {
-            console.log('g');
             gameOver = true;
             WinOrLose();
         } else {
-            console.log('h');
             checkMine(r, c);
         }
     }
@@ -161,45 +144,42 @@ function WinOrLose(){
     if (gameOver == true){
         document.getElementById("perdu").innerHTML = "Vous avez perdu ...";
         revealMines();
+        Chrono();
     } else if ((rows * cols) - minesCount == tilesCount){
-        document.getElementById("victoire").innerHTML = "Vous avez gagné !";
+        endTime = Date.now();
+        document.getElementById("victoire").innerHTML = "Vous avez gagné en " + displayTime(endTime - startTime);
         revealMines();
+        Chrono();
     } else {
         return;
     }
 }
 
 function checkMine(r, c) {
-    console.log('Clicked Tile:', r, c);
     if (r < 0 || r >= rows || c < 0 || c >= cols) {
         return;
     }
 
     let tile = board[r][c];
-    console.log('b');
     if (tile.classList.contains("tile-clicked")) {
         return;
     }
 
-    console.log('c');
     tile.classList.add("tile-clicked");
     tilesClicked += 1;
 
     let minesFound = 0;
 
-    // top 3
-    minesFound += checkTile(r - 1, c - 1);   // top left
-    minesFound += checkTile(r - 1, c);       // top 
-    minesFound += checkTile(r - 1, c + 1);   // top right
+    minesFound += checkTile(r - 1, c - 1);  
+    minesFound += checkTile(r - 1, c);     
+    minesFound += checkTile(r - 1, c + 1); 
 
-    // left and right
-    minesFound += checkTile(r, c - 1);       // left
-    minesFound += checkTile(r, c + 1);       // right
+    minesFound += checkTile(r, c - 1);     
+    minesFound += checkTile(r, c + 1);      
 
-    // bottom 3
-    minesFound += checkTile(r + 1, c - 1);   // bottom left
-    minesFound += checkTile(r + 1, c);       // bottom 
-    minesFound += checkTile(r + 1, c + 1);   // bottom right
+    minesFound += checkTile(r + 1, c - 1); 
+    minesFound += checkTile(r + 1, c);    
+    minesFound += checkTile(r + 1, c + 1);   
 
     if (minesFound > 0) {
         board[r][c].innerText = minesFound;
@@ -207,26 +187,22 @@ function checkMine(r, c) {
     } else {
         board[r][c].innerText = "";
         
-        //top 3
-        checkMine(r-1, c-1);    //top left
-        checkMine(r-1, c);      //top
-        checkMine(r-1, c+1);    //top right
+        checkMine(r-1, c-1);   
+        checkMine(r-1, c);     
+        checkMine(r-1, c+1);    
 
-        //left and right
-        checkMine(r, c-1);      //left
-        checkMine(r, c+1);      //right
+        checkMine(r, c-1);     
+        checkMine(r, c+1);      
 
-        //bottom 3
-        checkMine(r+1, c-1);    //bottom left
-        checkMine(r+1, c);      //bottom
-        checkMine(r+1, c+1);    //bottom right
+        checkMine(r+1, c-1);    
+        checkMine(r+1, c);  
+        checkMine(r+1, c+1);    
     }
 
     if (tilesClicked === rows * cols - minesCount) {
         document.getElementById("mines-count").innerText = "Cleared";
         gameOver = true;
     }
-    console.log('d');
     updateTileImage(tile, r, c);
 
     WinOrLose();
@@ -234,15 +210,12 @@ function checkMine(r, c) {
 
 function checkTile(r, c) {
     if (r < 0 || r >= rows || c < 0 || c >= cols) {
-        console.log('n');
         tilesCount += 1
-        console.log(tilesCount)
         WinOrLose();
         return 0;
         
     }
     if (minesLocation.includes(r.toString() + "-" + c.toString())) {
-        console.log('o');
         return 1;
     }
     return 0;
@@ -266,24 +239,15 @@ function updateTileImage(tile, r, c) {
 
     const flagImagePath = './images/flag.png'
 
-    if (tile.classList == "flagged"){
-        tile.src = `./images/flag.png`;
-        tile.disabled = true;
-    }
-
     if (tile.getAttribute("src") !== flagImagePath) {
         if (minesLocation.includes(r.toString() + "-" + c.toString())) {
-            console.log('a');
-            tile.src = "./images/bomb.png";  // Changer l'image en cas de mine
+            tile.src = "./images/bomb.png";
         } else {
-            console.log('b');
             let minesFound = countAdjacentMines(r, c);
             if (minesFound > 0) {
-                console.log('c');
-                tile.src = `./images/${minesFound}.png`;  // Changer l'image en cas de mine adjacente
+                tile.src = `./images/${minesFound}.png`;
             } else {
-                console.log('d');
-                tile.src = "./images/empty.png";  // Changer l'image s'il n'y a pas de mine
+                tile.src = "./images/empty.png";
             }
         }
     }
@@ -298,20 +262,48 @@ function revealMines() {
             } else {
                 let minesFound = countAdjacentMines(r, c);
                 if (minesFound > 0) {
-                    tile.src = `./images/${minesFound}.png`;  // Changer l'image en cas de mine adjacente
+                    tile.src = `./images/${minesFound}.png`;
                 } else {
-                    tile.src = "./images/empty.png";  // Changer l'image s'il n'y a pas de mine
+                    tile.src = "./images/empty.png";
                 }
             }
         }
     }
 }
 
-function handleRightClick(r, c, event) {
+function toggleFlag(r, c) {
     tile = board[r][c];
-    tile.classList.add("flagged");
-    updateTileImage();
-    event.preventDefault();
+
+    if (tile.classList.contains("flagged")) {
+        tile.classList = "";
+        tile.src = './images/normal.png';
+    } else {
+        tile.classList.add("flagged");
+        tile.src = './images/flag.png';
+    }
+    
 }
 
-document.oncontextmenu = new Function("return false");
+document.addEventListener("contextmenu", (event) => {
+    event.preventDefault();
+});
+
+function displayTime(duration){
+    var ms = duration % 1000,
+    sec = ((duration - ms) / 1000) % 60,
+    min = (duration - ms - (sec * 1000)) / 1000 / 60;
+
+    return (min + "").padStart(2, "0") + 
+    ":" + (sec + "").padStart(2, "0");
+}
+
+function Chrono(){
+    if (timer !== null){
+        clearInterval(timer);
+        timer = null;
+    } else {
+        startTime = Date.now();
+        timer = setInterval(function(){
+            timeEl.innerHTML = displayTime(Date.now() - startTime)}, 5);
+    }
+}
